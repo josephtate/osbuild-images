@@ -298,7 +298,7 @@ func ParseID(idStr string) (*distro.ID, error) {
 		return nil, err
 	}
 
-	if id.Name != "rhel" && id.Name != "centos" && id.Name != "almalinux" && id.Name != "almalinux_kitten" {
+	if id.Name != "rhel" && id.Name != "centos" && id.Name != "rocky" && id.Name != "almalinux" && id.Name != "almalinux_kitten" {
 		return nil, fmt.Errorf("invalid distro name: %s", id.Name)
 	}
 
@@ -316,8 +316,8 @@ func ParseID(idStr string) (*distro.ID, error) {
 	}
 
 	// RHEL uses minor version
-	if id.Name == "rhel" && id.MinorVersion == -1 {
-		return nil, fmt.Errorf("rhel requires minor version, but got: %d", id.MinorVersion)
+	if (id.Name == "rhel" || id.Name == "rocky") && id.MinorVersion == -1 {
+		return nil, fmt.Errorf("RHEL/Rocky Linux requires minor version, but got: %d", id.MinorVersion)
 	}
 
 	// So does AlmaLinux

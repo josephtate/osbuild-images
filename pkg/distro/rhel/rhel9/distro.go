@@ -44,10 +44,14 @@ func distroISOLabelFunc(t *rhel.ImageType) string {
 	const RHEL_ISO_LABEL = "RHEL-%s-%s-0-BaseOS-%s"
 	const CS_ISO_LABEL = "CentOS-Stream-%s-BaseOS-%s"
 	const ALMALINUX_ISO_LABEL = "AlmaLinux-%s-%s-%s-dvd"
+	const ROCKY_ISO_LABEL = "Rocky-%s-%s-dvd-%s"
 
 	if t.IsRHEL() {
 		osVer := strings.Split(t.Arch().Distro().OsVersion(), ".")
 		return fmt.Sprintf(RHEL_ISO_LABEL, osVer[0], osVer[1], t.Arch().Name())
+	} else if t.IsRocky() {
+		osVer := strings.Split(t.Arch().Distro().OsVersion(), ".")
+		return fmt.Sprintf(ROCKY_ISO_LABEL, osVer[0], osVer[1], t.Arch().Name())
 	} else if t.IsAlmaLinux() {
 		osVer := strings.Split(t.Arch().Distro().OsVersion(), ".")
 		return fmt.Sprintf(ALMALINUX_ISO_LABEL, osVer[0], osVer[1], t.Arch().Name())
@@ -378,7 +382,7 @@ func ParseID(idStr string) (*distro.ID, error) {
 		return nil, err
 	}
 
-	if id.Name != "rhel" && id.Name != "centos" && id.Name != "almalinux" {
+	if id.Name != "rhel" && id.Name != "centos" && id.Name != "rocky" && id.Name != "almalinux" {
 		return nil, fmt.Errorf("invalid distro name: %s", id.Name)
 	}
 
@@ -405,8 +409,8 @@ func ParseID(idStr string) (*distro.ID, error) {
 	}
 
 	// RHEL uses minor version
-	if id.Name == "rhel" && id.MinorVersion == -1 {
-		return nil, fmt.Errorf("rhel requires minor version, but got: %d", id.MinorVersion)
+	if (id.Name == "rhel" || id.Name == "rocky") && id.MinorVersion == -1 {
+		return nil, fmt.Errorf("RHEL/Rocky Linux requires minor version, but got: %d", id.MinorVersion)
 	}
 
 	// So does AlmaLinux

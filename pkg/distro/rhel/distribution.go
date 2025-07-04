@@ -105,6 +105,11 @@ func (d *Distribution) IsAlmaLinuxKitten() bool {
 	return strings.HasPrefix(d.name, "almalinux_kitten")
 }
 
+// Add Rocky Linux checks
+func (d *Distribution) IsRocky() bool {
+	return strings.HasPrefix(d.name, "rocky")
+}
+
 func (d *Distribution) GetDefaultImageConfig() *distro.ImageConfig {
 	if d.DefaultImageConfig == nil {
 		return nil
@@ -183,6 +188,21 @@ func NewDistribution(name string, major, minor int) (*Distribution, error) {
 			vendor:           "almalinux",
 			ostreeRefTmpl:    fmt.Sprintf("almalinux/%d/%%s/edge", major),
 			runner:           &runner.CentOS{Version: uint64(major)},
+		}
+	case "rocky":
+		if minor == -1 {
+			return nil, errors.New("Rocky Linux requires a minor version")
+		}
+
+		rd = &Distribution{
+			name:             fmt.Sprintf("rocky-%d.%d", major, minor),
+			product:          "Rocky Linux",
+			osVersion:        fmt.Sprintf("%d.%d", major, minor),
+			releaseVersion:   fmt.Sprintf("%d", major),
+			modulePlatformID: fmt.Sprintf("platform:el%d", major),
+			vendor:           "rocky",
+			ostreeRefTmpl:    fmt.Sprintf("rocky/%d/%%s/edge", major),
+			runner:           &runner.RHEL{Major: uint64(major), Minor: uint64(minor)},
 		}
 	default:
 		return nil, fmt.Errorf("unknown distro name: %s", name)

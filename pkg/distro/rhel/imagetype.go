@@ -141,6 +141,11 @@ func (t *ImageType) IsAlmaLinuxKitten() bool {
 	return t.arch.distro.IsAlmaLinuxKitten()
 }
 
+// Rocky Linux Support
+func (t *ImageType) IsRocky() bool {
+	return t.arch.distro.IsRocky()
+}
+
 func (t *ImageType) ISOLabel() (string, error) {
 	if !t.BootISO {
 		return "", fmt.Errorf("image type %q is not an ISO", t.name)
